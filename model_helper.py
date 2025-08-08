@@ -46,7 +46,6 @@ def load_model():
         download_model()
         model = CarClassifierResNet(num_classes=len(class_names))
         model.load_state_dict(torch.load(MODEL_PATH, map_location=DEVICE))
-        model.to(DEVICE)
         model.eval()
         trained_model = model
     return trained_model
@@ -60,7 +59,7 @@ def predict(image_path):
         transforms.Normalize(mean=[0.485, 0.456, 0.406],
                              std=[0.229, 0.224, 0.225])
     ])
-    image_tensor = transform(image).unsqueeze(0).to(DEVICE)
+    image_tensor = transform(image).unsqueeze(0)
 
     model = load_model()
 
@@ -68,6 +67,7 @@ def predict(image_path):
         output = model(image_tensor)
         _, predicted_class = torch.max(output, 1)
         return class_names[predicted_class.item()]
+
 
 
 
