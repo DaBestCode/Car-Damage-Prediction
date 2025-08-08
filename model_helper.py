@@ -2,12 +2,18 @@ import torch
 from torch import nn
 from torchvision import models, transforms
 from PIL import Image
+import gdown
+import os
+
+
 
 trained_model = None
 class_names = ['Front Breakage', 'Front Crushed', 'Front Normal', 'Rear Breakage', 'Rear Crushed', 'Rear Normal']
 
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 MODEL_PATH = "saved_model.pth"
-GOOGLE_DRIVE_FILE_ID = "1rryu5it14lUf-MmUDjrxlCvjpwVDsMTK"  # Your file ID
+GOOGLE_DRIVE_FILE_ID = "1rryu5it14lUf-MmUDjrxlCvjpwVDsMTK"  # file ID
 MODEL_URL = f"https://drive.google.com/uc?id={GOOGLE_DRIVE_FILE_ID}"
 
 def download_model():
@@ -67,6 +73,7 @@ def predict(image_path):
         output = model(image_tensor)
         _, predicted_class = torch.max(output, 1)
         return class_names[predicted_class.item()]
+
 
 
 
