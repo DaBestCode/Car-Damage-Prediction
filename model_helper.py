@@ -6,6 +6,16 @@ from PIL import Image
 trained_model = None
 class_names = ['Front Breakage', 'Front Crushed', 'Front Normal', 'Rear Breakage', 'Rear Crushed', 'Rear Normal']
 
+MODEL_PATH = "saved_model.pth"
+GOOGLE_DRIVE_FILE_ID = "1rryu5it14lUf-MmUDjrxlCvjpwVDsMTK"  # Your file ID
+MODEL_URL = f"https://drive.google.com/uc?id={GOOGLE_DRIVE_FILE_ID}"
+
+def download_model():
+    """Download model from Google Drive if it doesn't exist locally."""
+    if not os.path.exists(MODEL_PATH):
+        print(f"Model file not found. Downloading from {MODEL_URL}...")
+        gdown.download(MODEL_URL, MODEL_PATH, quiet=False)
+        print("✅ Model downloaded successfully.")
 
 # Load the pre-trained ResNet model
 class CarClassifierResNet(nn.Module):
@@ -29,6 +39,14 @@ class CarClassifierResNet(nn.Module):
     def forward(self, x):
         x = self.model(x)
         return x
+def load_model():
+    """Load the trained model from file."""
+    download_model()
+    model = CarClassifierResNet(num_classes=len(class_names))
+    model.load_state_dict(torch.load(MODEL_PATH, map_location=DEVICE))
+    model.to(DEVICE)
+    model.eval()
+    return model
 
 
 def predict(image_path):
@@ -51,4 +69,5 @@ def predict(image_path):
         output = trained_model(image_tensor)
         _, predicted_class = torch.max(output, 1)
         return class_names[predicted_class.item()]
+
 
